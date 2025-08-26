@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping List App</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+```
+<script type="text/babel">
+    const { useState } = React;
+    const { Trash2, Plus, GripVertical } = lucide;
+
+    const ShoppingApp = () => {
+        const [items, setItems] = useState([
+            { id: 1, name: 'Milk', category: 'Dairy', selected: false },
+            { id: 2, name: 'Bread', category: 'Bakery', selected: false },
+            { id: 3, name: 'Apples', category: 'Produce', selected: true },
+            { id: 4, name: 'Chicken', category: 'Meat', selected: false },
+            { id: 5, name: 'Yogurt', category: 'Dairy', selected: false },
+            { id: 6, name: 'Bananas', category: 'Produce', selected: false },
+        ]);
+
+        const [newItem, setNewItem] = useState('');
+        const [newCategory, setNewCategory] = useState('Produce');
+        const [draggedItem, setDraggedItem] = useState(null);
+
+        const categories = ['Produce', 'Dairy', 'Meat', 'Bakery', 'Pantry', 'Frozen', 'Other'];
+
+        const addItem = () => {
+            if (newItem.trim()) {
+                setItems([...items, {
+                    id: Date.now(),
+                    name: newItem.trim(),
+                    category: newCategory,
+                    selected: false
+                }]);
+                setNewItem('');
+            }
+        };
+
+        const deleteItem = (id) => {
+            setItems(items.filter(item => item.id !== id));
+        };
+
+        const toggleSelected = (id) => {
+            setItems(items.map(item => 
+                item.id === id ? { ...item, selected: !item.selected } : item
+            ));
+        };
+
+        const handleDragStart = (e, item) => {
+            setDraggedItem(item);
+            e.dataTransfer.effectAllowed = 'move';
+        };
+
+        const handleDragOver = (e, category) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        };
+
+        const handleDrop = (e, targetCategory) => {
+            e.preventDefault();
+            if (draggedItem && draggedItem.category !== targetCategory) {
+                setItems(items.map(item => 
+                    item.id === draggedItem.id 
+                        ? { ...item, category: targetCategory }
+                        : item
+                ));
+            }
+            setDraggedItem(null);
+        };
+
+        const groupedItems = categories.reduce((groups, category) => {
+            groups[category] = items.filter(item => item.category === category);
+            return groups;
+        }, {});
+
+        return React.createElement('div', {
+            className: "max-w-4xl mx-auto p-6 bg-gray-50 min-h-screen"
+        }, [
+            React.createElement('h1', {
+                key: 'title',
+                className: "text-2xl font-bold text-gray-800 mb-6"
+            }, 'Shopping List'),
+
+            // Add Item Form
+            React.createElement('div', {
+                key: 'form',
+                className: "bg-white rounded-lg shadow-sm p-4 mb-6"
+            }, 
+                React.createElement('div', {
+                    className: "flex gap-3"
+                }, [
+                    React.createElement('input', {
+                        key: 'input',
+                        type: 'text',
+                        value: newItem,
+                        onChange: (e) => setNewItem(e.target.value),
+                        placeholder: 'Add new item...',
+                        className: "flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+                        onKeyPress: (e) => e.key === 'Enter' && addItem()
+                    }),
+                    React.createElement('select', {
+                        key: 'select',
+                        value: newCategory,
+                        onChange: (e) => setNewCategory(e.target.value),
+                        className: "px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    }, categories.map(category => 
+                        React.createElement('option', {
+                            key: category,
+                            value: category
+                        }, category)
+                    )),
+                    React.createElement('button', {
+                        key: 'button',
+                        onClick: addItem,
+                        className: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    }, React.createElement(Plus, { size: 20 }))
+                ])
+            ),
+
+            // Shopping List by Category
+            React.createElement('div', {
+                key: 'categories',
+                className: "grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+            }, categories.map(category => {
+                const categoryItems = groupedItems[category];
+                if (categoryItems.length === 0) return null;
+                
+                return React.createElement('div', {
+                    key: category,
+                    className: "bg-white rounded-lg shadow-sm p-4",
+                    onDragOver: (e) => handleDragOver(e, category),
+                    onDrop: (e) => handleDrop(e, category)
+                }, [
+                    React.createElement('h2', {
+                        key: 'header',
+                        className: "text-lg font-semibold text-gray-700 mb-3 border-b pb-2"
+                    }, `${category} (${categoryItems.length})`),
+                    
+                    React.createElement('div', {
+                        key: 'items',
+                        className: "space-y-2"
+                    }, categoryItems.map(item => 
+                        React.createElement('div', {
+                            key: item.id,
+                            draggable: true,
+                            onDragStart: (e) => handleDragStart(e, item),
+                            className: `flex items-center gap-3 p-2 rounded-md cursor-move transition-colors ${
+                                item.selected 
+                                    ? 'bg-green-100 text-green-800' 
+                                    : 'bg-gray-50 hover:bg-gray-100'
+                            } ${draggedItem?.id === item.id ? 'opacity-50' : ''}`
+                        }, [
+                            React.createElement(GripVertical, { 
+                                key: 'grip',
+                                size: 16, 
+                                className: "text-gray-400" 
+                            }),
+                            
+                            React.createElement('input', {
+                                key: 'checkbox',
+                                type: 'checkbox',
+                                checked: item.selected,
+                                onChange: () => toggleSelected(item.id),
+                                className: "rounded focus:ring-2 focus:ring-blue-500"
+                            }),
+                            
+                            React.createElement('span', {
+                                key: 'name',
+                                className: `flex-1 ${item.selected ? 'line-through' : ''}`
+                            }, item.name),
+                            
+                            React.createElement('button', {
+                                key: 'delete',
+                                onClick: () => deleteItem(item.id),
+                                className: "text-red-500 hover:text-red-700 p-1"
+                            }, React.createElement(Trash2, { size: 16 }))
+                        ])
+                    ))
+                ]);
+            })),
+
+            // Summary
+            React.createElement('div', {
+                key: 'summary',
+                className: "mt-6 bg-white rounded-lg shadow-sm p-4"
+            }, 
+                React.createElement('div', {
+                    className: "flex justify-between text-sm text-gray-600"
+                }, [
+                    React.createElement('span', { key: 'total' }, `Total items: ${items.length}`),
+                    React.createElement('span', { key: 'selected' }, `Selected: ${items.filter(item => item.selected).length}`),
+                    React.createElement('span', { key: 'remaining' }, `Remaining: ${items.filter(item => !item.selected).length}`)
+                ])
+            )
+        ]);
+    };
+
+    ReactDOM.render(React.createElement(ShoppingApp), document.getElementById('root'));
+</script>
+```
+
+</body>
+</html>
