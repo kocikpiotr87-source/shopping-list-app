@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>Shopping List — Mobile + Realtime + PWA</title>
+  <title>Shopping List — Realtime PWA</title>
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.webmanifest">
@@ -12,9 +12,14 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .card:hover { box-shadow: 0 10px 30px rgb(0 0 0 / 0.08); transform: translateY(-1px); }
+    /* Compact buttons/inputs */
+    :root { --btn-py: .45rem; --btn-px: .8rem; --btn-radius: .55rem; }
+    .btn-sm { padding: var(--btn-py) var(--btn-px); border-radius: var(--btn-radius); font-size: .9rem; line-height: 1.2rem; }
+    .input-sm { padding: .65rem .75rem; border-radius: .7rem; font-size: .95rem; }
     .tap-row { min-height: 48px; touch-action: pan-y; }
     input[type="checkbox"] { width: 20px; height: 20px; }
+    .card:hover { box-shadow: 0 10px 30px rgb(0 0 0 / 0.08); transform: translateY(-1px); }
+    /* Swipe UI */
     .swipe-wrap { position: relative; overflow: hidden; }
     .swipe-bg   { position:absolute; inset:0; display:flex; align-items:center; justify-content:flex-end; padding-right:12px; background:#fee2e2; color:#b91c1c; font-weight:600; }
     .swipe-fore { position:relative; background:white; will-change: transform; transition: transform .15s ease-out; }
@@ -34,29 +39,29 @@
   <header class="sticky top-0 z-10 bg-slate-50/90 backdrop-blur border-b border-slate-200">
     <div class="max-w-6xl mx-auto px-3 sm:px-4 py-3 space-y-2">
       <div class="flex items-center justify-between">
-        <h1 class="text-xl sm:text-2xl font-semibold">🛒 Shopping List</h1>
+        <h1 class="text-xl sm:text-2xl font-semibold flex items-center gap-2">
+          <span>🛒 Shopping List</span>
+        </h1>
         <span id="statusDot" class="text-xs rounded-full px-2 py-1 bg-slate-200">offline</span>
       </div>
 
       <!-- Quick Add -->
       <div class="no-print grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-2">
-        <input id="addInput" type="text" placeholder="Add an item…"
-               class="w-full px-3 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"/>
-        <select id="addCat" class="px-3 py-3 rounded-lg border border-slate-300 bg-white"></select>
-        <button id="addBtn" class="px-4 py-3 rounded-lg bg-blue-600 text-white">Add</button>
+        <input id="addInput" type="text" placeholder="Add an item…" class="w-full input-sm border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"/>
+        <select id="addCat" class="input-sm border border-slate-300 bg-white"></select>
+        <button id="addBtn" class="btn-sm bg-blue-600 text-white">Add</button>
       </div>
 
       <!-- Search + controls -->
       <div class="flex flex-col sm:flex-row gap-2 no-print">
-        <input id="search" type="search" placeholder="Search items…"
-               class="w-full sm:w-80 px-3 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"/>
-        <div class="flex gap-2">
-          <label class="flex items-center gap-2 px-3 py-3 rounded-lg border border-slate-300 bg-white cursor-pointer w-full sm:w-auto">
+        <input id="search" type="search" placeholder="Search items…" class="w-full sm:w-80 input-sm border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"/>
+        <div class="flex gap-2 controls-sm w-full sm:w-auto">
+          <label class="flex items-center gap-2 input-sm border border-slate-300 bg-white cursor-pointer grow sm:grow-0">
             <input id="hideChecked" type="checkbox" class="shrink-0"><span class="text-sm">Hide checked</span>
           </label>
-          <button id="btnAisle" class="px-4 py-3 rounded-lg bg-purple-600 text-white w-full sm:w-auto">Aisle order</button>
-          <button id="resetBtn" class="px-4 py-3 rounded-lg bg-amber-500 text-white w-full sm:w-auto">Reset</button>
-          <button id="shareRealtime" class="px-4 py-3 rounded-lg bg-teal-600 text-white w-full sm:w-auto">Share Live Link</button>
+          <button id="btnAisle" class="btn-sm bg-purple-600 text-white grow sm:grow-0">Aisle order</button>
+          <button id="resetBtn" class="btn-sm bg-amber-500 text-white grow sm:grow-0">Reset</button>
+          <button id="shareRealtime" class="btn-sm bg-teal-600 text-white grow sm:grow-0">Share Live Link</button>
         </div>
       </div>
     </div>
@@ -69,10 +74,10 @@
   <!-- Bottom actions -->
   <div class="no-print bg-white/95 backdrop-blur border-t border-slate-200 mobile-sticky fixed md:static left-0 right-0 md:max-w-6xl bottom-0">
     <div class="px-3 sm:px-4 py-2 md:py-0 flex gap-2 md:justify-end">
-      <button id="selectAll" class="px-4 py-3 rounded-lg bg-blue-600 text-white">Select all</button>
-      <button id="clearChecked" class="px-4 py-3 rounded-lg bg-slate-200 hover:bg-slate-300">Clear</button>
-      <button id="printBtn" class="px-4 py-3 rounded-lg bg-slate-200 hover:bg-slate-300 hidden md:inline-flex">Print</button>
-      <button id="shareBtn" class="px-4 py-3 rounded-lg bg-slate-200 hover:bg-slate-300 hidden md:inline-flex">Share</button>
+      <button id="selectAll" class="btn-sm bg-blue-600 text-white">Select all</button>
+      <button id="clearChecked" class="btn-sm bg-slate-200 hover:bg-slate-300">Clear</button>
+      <button id="printBtn" class="btn-sm bg-slate-200 hover:bg-slate-300 hidden md:inline-flex">Print</button>
+      <button id="shareBtn" class="btn-sm bg-slate-200 hover:bg-slate-300 hidden md:inline-flex">Share</button>
     </div>
   </div>
 
@@ -83,15 +88,15 @@
         <h2 class="font-medium text-base sm:text-lg title"></h2>
         <div class="flex items-center gap-2 no-print">
           <span class="text-xs font-mono px-2 py-0.5 rounded bg-slate-200 text-slate-700 count">0/0</span>
-          <select class="sortSel px-2 py-2 rounded-lg border border-slate-300 bg-white text-sm">
+          <select class="sortSel btn-sm border border-slate-300 bg-white text-sm">
             <option value="original">Original</option>
             <option value="az">A → Z</option>
             <option value="za">Z → A</option>
           </select>
-          <label class="inline-flex items-center gap-1 px-2 py-2 rounded-lg border border-slate-300 bg-white text-sm cursor-pointer">
+          <label class="inline-flex items-center gap-1 btn-sm border border-slate-300 bg-white text-sm cursor-pointer">
             <input type="checkbox" class="chkLast size-4"> Last
           </label>
-          <button class="toggle px-3 py-2 rounded-lg border border-slate-300 bg-slate-100 text-sm">Collapse</button>
+          <button class="toggle btn-sm border border-slate-300 bg-slate-100 text-sm">Collapse</button>
         </div>
       </div>
       <hr class="border-slate-200 mt-2">
@@ -120,31 +125,27 @@
     </div>
   </div>
 
-  <!-- Firebase (realtime sync) -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore-compat.js"></script>
 
   <script>
-    // ---- YOUR FIREBASE CONFIG (replace with your values) ----
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyDASaHdDXfIQNxjC1GMoC5GutfUezP-O2o",
-  authDomain: "xxxx-138f2.firebaseapp.com",
-  projectId: "xxxx-138f2",
-  storageBucket: "xxxx-138f2.firebasestorage.app",
-  messagingSenderId: "207992388283",
-  appId: "1:207992388283:web:53648b7a89c46a86d6c79e",
-  measurementId: "G-T9TBLF0L95"
-};
+    // ---- PASTE YOUR FIREBASE CONFIG HERE ----
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "SENDER_ID",
+      appId: "APP_ID"
+    };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-
-    // Anonymous auth for simplicity
     auth.signInAnonymously().catch(console.error);
 
-    // ---- Base data ----
+    // ---- Data ----
     const INITIAL_DATA = {
       "FARMERS MARKET": [
         "any other fruit or veg you see that looks good and is reasonable",
@@ -185,82 +186,64 @@ const firebaseConfig = {
       ],
       "🍞 Bakery": ["Challah","Bread","Pizza dough","Buns","Kids bread","Hot dog buns","Plain bagels for Louisa lunch"]
     };
+
     const AISLE_ORDER = [
       "FARMERS MARKET","Produce","🧀 Dairy & Eggs","🥩 Meat & Alternatives",
       "❄️ Frozen","🥫 Pantry & Dry Goods","🍝 Grains & Pasta",
       "🥣 Cereal","🧃 Beverages","🍬 Snacks & Treats","🍞 Bakery"
     ];
 
-    // ---- Local fallback (used for offline + initial render) ----
-    const STORAGE_VER = "v9";
+    // ---- Local storage (with persisted collapsed state) ----
+    const STORAGE_VER = "v10";
     const STORAGE_KEY = "shopping-list-" + STORAGE_VER;
     function seedLocal() {
+      const startCollapsed = window.matchMedia("(max-width: 767px)").matches;
       const s = { _meta: { order: Object.keys(INITIAL_DATA) } };
       for (const [cat, arr] of Object.entries(INITIAL_DATA)) {
         s[cat] = {
           sort: "original",
           checkedLast: false,
+          collapsed: startCollapsed,            // <-- persist collapsed per category
           items: arr.map((name, i) => ({ id:`${cat}-${i}`, idx:i, name, checked:false }))
         };
       }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
       return s;
     }
-    function loadLocal() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || seedLocal(); }
-      catch { return seedLocal(); }
-    }
+    function loadLocal(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || seedLocal(); } catch { return seedLocal(); } }
     function saveLocal(s){ localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
 
-    // ---- Realtime doc (listId via URL) ----
+    // ---- Realtime doc (by ?listId=) ----
     const params = new URLSearchParams(location.search);
     let listId = params.get("listId") || null;
-    if (!listId) { // generate and redirect with id to make sharing easy
-      listId = Math.random().toString(36).slice(2, 10);
-      params.set("listId", listId);
-      history.replaceState(null, "", `?${params.toString()}${location.hash}`);
-    }
+    if (!listId) { listId = Math.random().toString(36).slice(2,10); params.set("listId", listId); history.replaceState(null, "", `?${params.toString()}${location.hash}`); }
     const docRef = db.collection("shoppingLists").doc(listId);
 
-    // presence indicator
     const statusDot = document.getElementById("statusDot");
     function setOnline(v){ statusDot.textContent = v ? "online" : "offline"; statusDot.className = `text-xs rounded-full px-2 py-1 ${v?'bg-emerald-200':'bg-slate-200'}` }
 
-    // initial local state
     let STATE = loadLocal();
     let lastDeleted = null;
     let suppressNextLocalSave = false;
 
-    // create doc if missing
-    async function ensureDoc() {
-      const snap = await docRef.get();
-      if (!snap.exists) {
-        await docRef.set({ state: STATE, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-      }
-    }
+    async function ensureDoc(){ const snap = await docRef.get(); if(!snap.exists){ await docRef.set({ state: STATE, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }); } }
 
-    // listen for changes
     auth.onAuthStateChanged(async () => {
       try {
-        await ensureDoc();
-        setOnline(true);
+        await ensureDoc(); setOnline(true);
         docRef.onSnapshot(snap => {
           if (!snap.exists) return;
           const cloud = snap.data().state;
-          // Merge strategy: cloud wins; overwrite local then render
           suppressNextLocalSave = true;
           STATE = cloud;
           saveLocal(STATE);
           render();
         }, () => setOnline(false));
-      } catch {
-        setOnline(false);
-      }
+      } catch { setOnline(false); }
     });
 
-    // batched save to cloud
     let saveTimer = null;
-    function saveBoth() {
+    function saveBoth(){
       saveLocal(STATE);
       if (suppressNextLocalSave) { suppressNextLocalSave = false; return; }
       clearTimeout(saveTimer);
@@ -272,7 +255,7 @@ const firebaseConfig = {
       }, 200);
     }
 
-    // ---------- UI logic (same as your mobile build, shortened where possible) ----------
+    // Helpers
     function allCategories(){ return Object.keys(STATE).filter(k => k !== "_meta"); }
     function sortItems(catObj){
       const { sort, checkedLast } = catObj;
@@ -284,6 +267,7 @@ const firebaseConfig = {
       });
     }
 
+    // UI
     const grid  = document.getElementById("listRoot");
     const cardTpl = document.getElementById("cardTpl");
     const rowTpl  = document.getElementById("rowTpl");
@@ -302,7 +286,7 @@ const firebaseConfig = {
       const q = document.getElementById("search").value.trim().toLowerCase();
       const hideChecked = document.getElementById("hideChecked").checked;
 
-      // fill Add select
+      // Fill Add select
       const addSel = document.getElementById('addCat');
       addSel.innerHTML = '';
       allCategories().forEach(cat => {
@@ -324,14 +308,19 @@ const firebaseConfig = {
         const chkLast = card.querySelector(".chkLast");
         const toggle  = card.querySelector(".toggle");
 
-        // mobile default collapsed
-        if (window.matchMedia("(max-width: 767px)").matches) { content.classList.add("hidden"); toggle.textContent = "Expand"; }
+        // Use persisted collapsed state (no auto-collapse on render)
+        if (catObj.collapsed) { content.classList.add("hidden"); toggle.textContent = "Expand"; }
+        else { content.classList.remove("hidden"); toggle.textContent = "Collapse"; }
 
         sortSel.value = catObj.sort || "original";
         chkLast.checked = !!catObj.checkedLast;
         sortSel.addEventListener("change", () => { catObj.sort = sortSel.value; saveBoth(); render(); });
         chkLast.addEventListener("change", () => { catObj.checkedLast = chkLast.checked; saveBoth(); render(); });
-        toggle.addEventListener("click", () => { const hidden = content.classList.toggle("hidden"); toggle.textContent = hidden ? "Expand" : "Collapse"; });
+        toggle.addEventListener("click", () => {
+          catObj.collapsed = !catObj.collapsed;     // persist
+          saveBoth();
+          render();
+        });
 
         let checked = 0;
         const sorted = sortItems(catObj);
@@ -350,13 +339,15 @@ const firebaseConfig = {
           box.checked = !!it.checked;
 
           box.addEventListener("change", () => { it.checked = box.checked; saveBoth(); render(); });
-          delBtn.addEventListener("click", () => removeItem(cat, it, indexInSorted));
 
-          // swipe-to-delete
+          // Delete button with confirmation
+          delBtn.addEventListener("click", () => confirmDelete(cat, it, indexInSorted, fore));
+
+          // Swipe-to-delete (still asks for confirmation)
           let startX=0, curX=0, dragging=false; const THRESH=72;
           fore.addEventListener('touchstart', (e)=>{ startX=e.touches[0].clientX; dragging=true; fore.style.transition='none'; }, {passive:true});
           fore.addEventListener('touchmove',  (e)=>{ if(!dragging)return; curX=e.touches[0].clientX; const dx=Math.min(0, curX-startX); fore.style.transform=`translateX(${dx}px)`; }, {passive:true});
-          fore.addEventListener('touchend',   ()=>{ dragging=false; fore.style.transition=''; const dx=Math.min(0, curX-startX); if(Math.abs(dx)>THRESH){ fore.style.transform='translateX(-100%)'; setTimeout(()=>removeItem(cat,it,indexInSorted),120);} else { fore.style.transform=''; } });
+          fore.addEventListener('touchend',   ()=>{ dragging=false; fore.style.transition=''; const dx=Math.min(0, curX-startX); if(Math.abs(dx)>THRESH){ confirmDelete(cat,it,indexInSorted,fore,true); } else { fore.style.transform=''; } });
 
           content.appendChild(rowWrap);
         });
@@ -364,6 +355,14 @@ const firebaseConfig = {
         cnt.textContent = `${checked}/${catObj.items.length}`;
         grid.appendChild(card);
       });
+    }
+
+    function confirmDelete(cat, it, indexInSorted, foreEl, fromSwipe=false){
+      if (!confirm(`Delete "${it.name}"?`)) {
+        if (fromSwipe && foreEl) foreEl.style.transform = '';
+        return;
+      }
+      removeItem(cat, it, indexInSorted);
     }
 
     function removeItem(cat, it, indexInSorted){
@@ -394,6 +393,8 @@ const firebaseConfig = {
       const id = `${cat}-${Date.now()}`;
       catObj.items.push({ id, idx: nextIdx, name, checked:false });
       document.getElementById('addInput').value = '';
+      // Auto open that card and persist
+      catObj.collapsed = false;
       saveBoth(); render();
     }
     document.getElementById('addBtn').addEventListener('click', quickAdd);
@@ -434,7 +435,6 @@ const firebaseConfig = {
       saveBoth(); render();
     });
 
-    document.getElementById("printBtn")?.addEventListener("click", () => window.print());
     document.getElementById("shareBtn")?.addEventListener("click", async () => {
       const url = new URL(location.href);
       const checkedIds = [];
@@ -447,14 +447,13 @@ const firebaseConfig = {
       catch { alert("Copy failed—copy the URL manually."); }
     });
 
-    // Share collaborative link (same listId)
     document.getElementById("shareRealtime").addEventListener("click", async () => {
       const url = `${location.origin}${location.pathname}?listId=${encodeURIComponent(listId)}${location.hash}`;
       try { await navigator.clipboard.writeText(url); alert("Live link copied. Send it to your collaborator."); }
       catch { prompt("Copy this live link:", url); }
     });
 
-    // Restore checked from hash (one-time)
+    // Restore from hash (one-time)
     (function restoreFromHash(){
       if (!location.hash) return;
       const parts = location.hash.slice(1).split(",").filter(Boolean);
@@ -469,7 +468,7 @@ const firebaseConfig = {
       saveBoth();
     })();
 
-    // PWA: register service worker
+    // PWA
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js');
     }
