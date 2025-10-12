@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Shopping List — Preloaded</title>
+  <title>Shopping List — Preloaded + Sorting</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .card:hover { box-shadow: 0 10px 30px rgb(0 0 0 / 0.08); transform: translateY(-1px); }
@@ -24,6 +24,17 @@
         <label class="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-slate-300 bg-white cursor-pointer">
           <input id="hideChecked" type="checkbox" class="size-4"> <span class="text-sm">Hide checked</span>
         </label>
+
+        <!-- NEW: Sorting controls -->
+        <select id="sortBy" class="px-3 py-2 rounded-md border border-slate-300 bg-white">
+          <option value="original">Sort: Original</option>
+          <option value="az">Sort: A → Z</option>
+          <option value="za">Sort: Z → A</option>
+        </select>
+        <label class="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-slate-300 bg-white cursor-pointer">
+          <input id="checkedLast" type="checkbox" class="size-4"> <span class="text-sm">Checked last</span>
+        </label>
+
         <button id="selectAll" class="px-3 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700">Select all in view</button>
         <button id="clearChecked" class="px-3 py-2 rounded-md bg-slate-200 hover:bg-slate-300">Clear checked</button>
         <button id="resetBtn" class="px-3 py-2 rounded-md bg-amber-500 text-white hover:bg-amber-600">Reset to defaults</button>
@@ -59,7 +70,7 @@
   </template>
 
   <script>
-    // ---- Preloaded data (exactly what you provided) ----
+    // ---- Preloaded data (your list) ----
     const INITIAL_DATA = {
       "FARMERS MARKET": [
         "any other fruit or veg you see that looks good and is reasonable",
@@ -101,28 +112,41 @@
       "🍞 Bakery": ["Challah","Bread","Pizza dough","Buns","Kids bread","Hot dog buns","Plain bagels for Louisa lunch"]
     };
 
-    // ---- Versioned storage so your old saved sample is ignored ----
-    const STORAGE_VER = "v3";
+    // ---- Versioned storage ----
+    const STORAGE_VER = "v4";              // bumped for fresh preload
     const STORAGE_KEY = "shopping-list-" + STORAGE_VER;
 
     function seedState() {
       const s = {};
       for (const [cat, arr] of Object.entries(INITIAL_DATA)) {
-        s[cat] = arr.map((name, i) => ({ id: `${cat}-${i}`, name, checked: false }));
+        s[cat] = arr.map((name, i) => ({ id: `${cat}-${i}`, idx:i, name, checked:false }));
       }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
       return s;
     }
     function loadState() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return seedState();
-        return JSON.parse(raw);
-      } catch { return seedState(); }
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || seedState(); }
+      catch { return seedState(); }
     }
     function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
 
     let STATE = loadState();
+
+    // ---- Sorting helper (applies to every category) ----
+    function sortItems(items) {
+      const sortBy = document.getElementById("sortBy").value;
+      const checkedLast = document.getElementById("checkedLast").checked;
+
+      return [...items].sort((a,b) => {
+        // 1) group checked to the end if requested
+        if (checkedLast && a.checked !== b.checked) return a.checked ? 1 : -1;
+
+        // 2) then apply name sort or original order
+        if (sortBy === "az")  return a.name.localeCompare(b.name, undefined, {sensitivity:'base'});
+        if (sortBy === "za")  return b.name.localeCompare(a.name, undefined, {sensitivity:'base'});
+        return a.idx - b.idx; // original
+      });
+    }
 
     // ---- Rendering ----
     const root = document.getElementById("listRoot");
@@ -143,7 +167,11 @@
         const cnt = card.querySelector(".count");
 
         let visible = 0, checked = 0;
-        items.forEach(it => {
+
+        // apply global sorting to the category
+        const sorted = sortItems(items);
+
+        sorted.forEach(it => {
           if (it.checked) checked++;
           const matches = !q || it.name.toLowerCase().includes(q);
           const hidden = (hideChecked && it.checked) || !matches;
@@ -164,7 +192,6 @@
 
         cnt.textContent = `${checked}/${items.length}`;
 
-        // Start expanded if there are visible items; collapsed if none
         if (visible === 0) { content.classList.add("hidden"); caret.classList.remove("rotate-180"); }
         toggle.addEventListener("click", () => { content.classList.toggle("hidden"); caret.classList.toggle("rotate-180"); });
 
@@ -175,6 +202,9 @@
     // ---- Controls ----
     document.getElementById("search").addEventListener("input", render);
     document.getElementById("hideChecked").addEventListener("change", render);
+    document.getElementById("sortBy").addEventListener("change", render);       // NEW
+    document.getElementById("checkedLast").addEventListener("change", render);  // NEW
+
     document.getElementById("selectAll").addEventListener("click", () => {
       const q = document.getElementById("search").value.trim().toLowerCase();
       const hideChecked = document.getElementById("hideChecked").checked;
@@ -186,16 +216,20 @@
       }
       saveState(STATE); render();
     });
+
     document.getElementById("clearChecked").addEventListener("click", () => {
       for (const arr of Object.values(STATE)) arr.forEach(it => it.checked = false);
       saveState(STATE); render();
     });
+
     document.getElementById("resetBtn").addEventListener("click", () => {
       localStorage.removeItem(STORAGE_KEY);
       STATE = seedState();
       render();
     });
+
     document.getElementById("printBtn").addEventListener("click", () => window.print());
+
     document.getElementById("shareBtn").addEventListener("click", async () => {
       const url = new URL(location.href);
       const checkedIds = [];
