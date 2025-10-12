@@ -1,17 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Shopping List — DnD + Dark Mode</title>
-  <script>
-    // Tailwind config (enable class-based dark mode)
-    tailwind = { config: { darkMode: 'class' } };
-  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Shopping List — Per-Card Sort + Aisle Order</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .card:hover { box-shadow: 0 10px 30px rgb(0 0 0 / 0.08); transform: translateY(-1px); }
-    .drag-ghost { opacity: .35; }
     @media print {
       .no-print { display:none !important; }
       body { background:#fff; }
@@ -19,63 +14,54 @@
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100">
-  <header class="sticky top-0 z-10 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-700">
+<body class="bg-slate-50 text-slate-800">
+  <header class="sticky top-0 z-10 bg-slate-50/90 backdrop-blur border-b border-slate-200">
     <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
       <h1 class="text-2xl font-semibold tracking-tight">🛒 Shopping List</h1>
       <div class="flex flex-wrap gap-2 no-print">
         <input id="search" type="search" placeholder="Search items…"
-               class="w-64 max-w-[70vw] px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-        <label class="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 cursor-pointer">
+               class="w-64 max-w-[70vw] px-3 py-2 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <label class="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-slate-300 bg-white cursor-pointer">
           <input id="hideChecked" type="checkbox" class="size-4"> <span class="text-sm">Hide checked</span>
         </label>
 
         <button id="btnAisle" class="px-3 py-2 rounded-md bg-purple-600 text-white hover:bg-purple-700">Apply Aisle Order</button>
         <button id="selectAll" class="px-3 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700">Select all in view</button>
-        <button id="clearChecked" class="px-3 py-2 rounded-md bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600">Clear checked</button>
+        <button id="clearChecked" class="px-3 py-2 rounded-md bg-slate-200 hover:bg-slate-300">Clear checked</button>
         <button id="resetBtn" class="px-3 py-2 rounded-md bg-amber-500 text-white hover:bg-amber-600">Reset to defaults</button>
-        <button id="printBtn" class="px-3 py-2 rounded-md bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600">Print</button>
-        <button id="shareBtn" class="px-3 py-2 rounded-md bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600">Share/Copy link</button>
-
-        <!-- Dark mode toggle -->
-        <label class="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 cursor-pointer">
-          <input id="darkToggle" type="checkbox" class="size-4"> <span class="text-sm">Dark</span>
-        </label>
+        <button id="printBtn" class="px-3 py-2 rounded-md bg-slate-200 hover:bg-slate-300">Print</button>
+        <button id="shareBtn" class="px-3 py-2 rounded-md bg-slate-200 hover:bg-slate-300">Share/Copy link</button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto p-4 space-y-4">
-    <!-- DnD hint -->
-    <p class="text-sm text-slate-500 dark:text-slate-400 no-print">Tip: drag a category card by its header to reorder.</p>
-    <div id="listRoot" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"></div>
-  </main>
+  <main class="max-w-6xl mx-auto p-4 space-y-4" id="listRoot"></main>
 
-  <!-- Card template (per-card sort + checked-last + collapse) -->
+  <!-- Card template (now with per-card sort controls) -->
   <template id="cardTpl">
-    <section class="card bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl transition shadow-sm" draggable="true">
-      <div class="px-4 pt-3 flex items-center justify-between handle cursor-grab active:cursor-grabbing">
-        <h2 class="font-medium text-lg title select-none"></h2>
+    <section class="card bg-white border border-slate-200 rounded-xl transition shadow-sm">
+      <div class="px-4 pt-3 flex items-center justify-between">
+        <h2 class="font-medium text-lg title"></h2>
         <div class="flex items-center gap-2 no-print">
-          <span class="text-xs font-mono px-2 py-0.5 rounded bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200 count">0/0</span>
-          <select class="sortSel px-2 py-1 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm">
+          <span class="text-xs font-mono px-2 py-0.5 rounded bg-slate-200 text-slate-700 count">0/0</span>
+          <select class="sortSel px-2 py-1 rounded-md border border-slate-300 bg-white text-sm">
             <option value="original">Original</option>
             <option value="az">A → Z</option>
             <option value="za">Z → A</option>
           </select>
-          <label class="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm cursor-pointer">
+          <label class="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-slate-300 bg-white text-sm cursor-pointer">
             <input type="checkbox" class="chkLast size-4"> Checked last
           </label>
-          <button class="toggle px-2 py-1 rounded-md border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-700 text-sm">Collapse</button>
+          <button class="toggle px-2 py-1 rounded-md border border-slate-300 bg-slate-100 text-sm">Collapse</button>
         </div>
       </div>
-      <hr class="border-slate-200 dark:border-slate-700 mt-2">
+      <hr class="border-slate-200 mt-2">
       <div class="px-4 py-3 grid gap-2 content"></div>
     </section>
   </template>
 
   <template id="rowTpl">
-    <label class="group flex items-center gap-3 px-2 py-2 rounded-md border border-transparent hover:border-slate-200 dark:hover:border-slate-600 cursor-pointer">
+    <label class="group flex items-center gap-3 px-2 py-2 rounded-md border border-transparent hover:border-slate-200 cursor-pointer">
       <input type="checkbox" class="size-4 mt-0.5">
       <span class="flex-1 item-name"></span>
       <button type="button" title="Delete" class="no-print opacity-0 group-hover:opacity-100 transition text-red-600 hover:text-red-700 px-1">🗑️</button>
@@ -125,23 +111,23 @@
       "🍞 Bakery": ["Challah","Bread","Pizza dough","Buns","Kids bread","Hot dog buns","Plain bagels for Louisa lunch"]
     };
 
-    // Aisle order preset
+    // Aisle order preset (left→right path)
     const AISLE_ORDER = [
       "FARMERS MARKET","Produce","🧀 Dairy & Eggs","🥩 Meat & Alternatives",
       "❄️ Frozen","🥫 Pantry & Dry Goods","🍝 Grains & Pasta",
       "🥣 Cereal","🧃 Beverages","🍬 Snacks & Treats","🍞 Bakery"
     ];
 
-    // ---------- STORAGE (versioned; includes theme + order) ----------
-    const STORAGE_VER = "v6";
+    // ---------- STORAGE (versioned) ----------
+    const STORAGE_VER = "v5";
     const STORAGE_KEY = "shopping-list-" + STORAGE_VER;
 
     function seedState() {
-      const s = { _meta: { order: Object.keys(INITIAL_DATA), theme: 'light' } };
+      const s = { _meta: { order: Object.keys(INITIAL_DATA) } };
       for (const [cat, arr] of Object.entries(INITIAL_DATA)) {
         s[cat] = {
-          sort: "original",
-          checkedLast: false,
+          sort: "original",        // per-category
+          checkedLast: false,      // per-category
           items: arr.map((name, i) => ({ id:`${cat}-${i}`, idx:i, name, checked:false }))
         };
       }
@@ -156,17 +142,6 @@
 
     let STATE = loadState();
 
-    // ---------- THEME ----------
-    function applyTheme(fromState=true){
-      const want = fromState ? (STATE._meta?.theme || 'light') :
-        (document.body.classList.contains('dark') ? 'dark' : 'light');
-      document.body.classList.toggle('dark', want === 'dark');
-      if (!fromState) { STATE._meta.theme = want; saveState(STATE); }
-      document.getElementById('darkToggle').checked = want === 'dark';
-    }
-    // Initialize theme immediately
-    applyTheme();
-
     // ---------- HELPERS ----------
     function sortItems(catObj){
       const { sort, checkedLast } = catObj;
@@ -179,7 +154,7 @@
     }
 
     // ---------- RENDER ----------
-    const grid  = document.getElementById("listRoot");
+    const root  = document.getElementById("listRoot");
     const cardTpl = document.getElementById("cardTpl");
     const rowTpl  = document.getElementById("rowTpl");
 
@@ -187,7 +162,7 @@
       const q = document.getElementById("search").value.trim().toLowerCase();
       const hideChecked = document.getElementById("hideChecked").checked;
 
-      grid.innerHTML = "";
+      root.innerHTML = "";
 
       const order = STATE._meta?.order ?? Object.keys(INITIAL_DATA);
       order.forEach(cat => {
@@ -195,18 +170,18 @@
         if (!catObj) return;
 
         const card = cardTpl.content.firstElementChild.cloneNode(true);
-        card.dataset.cat = cat;
         card.querySelector(".title").textContent = cat;
-
         const content = card.querySelector(".content");
         const cnt = card.querySelector(".count");
         const sortSel = card.querySelector(".sortSel");
         const chkLast = card.querySelector(".chkLast");
         const toggle  = card.querySelector(".toggle");
 
+        // init controls
         sortSel.value = catObj.sort || "original";
         chkLast.checked = !!catObj.checkedLast;
 
+        // wire control events (persist per-category)
         sortSel.addEventListener("change", () => { catObj.sort = sortSel.value; saveState(STATE); render(); });
         chkLast.addEventListener("change", () => { catObj.checkedLast = chkLast.checked; saveState(STATE); render(); });
         toggle.addEventListener("click", () => {
@@ -214,6 +189,7 @@
           toggle.textContent = hidden ? "Expand" : "Collapse";
         });
 
+        // rows
         let checked = 0, visible = 0;
         const sorted = sortItems(catObj);
         sorted.forEach(it => {
@@ -238,28 +214,7 @@
         cnt.textContent = `${checked}/${catObj.items.length}`;
         if (visible === 0) { content.classList.add("hidden"); toggle.textContent = "Expand"; }
 
-        // ---- DnD for category cards ----
-        card.addEventListener('dragstart', (e) => {
-          e.dataTransfer.setData('text/plain', cat);
-          card.classList.add('drag-ghost');
-        });
-        card.addEventListener('dragend', () => card.classList.remove('drag-ghost'));
-        card.addEventListener('dragover', (e) => e.preventDefault());
-        card.addEventListener('drop', (e) => {
-          e.preventDefault();
-          const draggedCat = e.dataTransfer.getData('text/plain');
-          if (!draggedCat || draggedCat === cat) return;
-          const arr = STATE._meta.order.slice();
-          const from = arr.indexOf(draggedCat);
-          const to = arr.indexOf(cat);
-          if (from === -1 || to === -1) return;
-          arr.splice(to, 0, arr.splice(from,1)[0]);
-          STATE._meta.order = arr;
-          saveState(STATE);
-          render();
-        });
-
-        grid.appendChild(card);
+        root.appendChild(card);
       });
     }
 
@@ -288,7 +243,6 @@
     document.getElementById("resetBtn").addEventListener("click", () => {
       localStorage.removeItem(STORAGE_KEY);
       STATE = seedState();
-      applyTheme(); // reset theme to light
       render();
     });
 
@@ -306,22 +260,17 @@
       catch { alert("Copy failed—copy the URL manually."); }
     });
 
+    // Apply aisle order preset
     document.getElementById("btnAisle").addEventListener("click", () => {
       const known = new Set(Object.keys(STATE).filter(k => k !== "_meta"));
       const preset = AISLE_ORDER.filter(c => known.has(c));
       const remainder = [...known].filter(c => !preset.includes(c)).sort();
-      STATE._meta.order = [...preset, ...remainder];
-      saveState(STATE); render();
-    });
-
-    // Dark mode toggle
-    document.getElementById('darkToggle').addEventListener('change', (e) => {
-      document.body.classList.toggle('dark', e.target.checked);
-      STATE._meta.theme = e.target.checked ? 'dark' : 'light';
+      STATE._meta = { ...(STATE._meta||{}), order: [...preset, ...remainder] };
       saveState(STATE);
+      render();
     });
 
-    // Restore checked from shared link
+    // Restore checked items from URL hash (shared link)
     (function restoreFromHash(){
       if (!location.hash) return;
       const parts = location.hash.slice(1).split(",").filter(Boolean);
