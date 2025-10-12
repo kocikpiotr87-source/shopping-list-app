@@ -1,0 +1,235 @@
+import React, { useState, useEffect } from ‘react’;
+import { Check } from ‘lucide-react’;
+
+const ShoppingList = () => {
+const initialItems = {
+“FARMERS MARKET”: [
+{ id: ‘fm1’, text: ‘any other fruit or veg you see that looks good and is reasonable’, checked: false },
+{ id: ‘fm2’, text: ‘only if still looks good Lettuce - 1 large head or 2 small’, checked: true },
+{ id: ‘fm3’, text: ‘Apples’, checked: true },
+{ id: ‘fm4’, text: ‘Pears’, checked: true },
+{ id: ‘fm5’, text: ‘only if still looks good tomatoes- nice mix’, checked: true },
+{ id: ‘fm6’, text: ‘corn’, checked: true },
+{ id: ‘fm7’, text: ‘zucchini’, checked: true },
+{ id: ‘fm8’, text: ‘Cucumber’, checked: true }
+],
+“🥬 Produce”: [
+{ id: ‘p1’, text: ‘Bananas’, checked: true },
+{ id: ‘p2’, text: ‘Potatoes yellow or yukon’, checked: true },
+{ id: ‘p3’, text: ‘Lemons (lots)’, checked: true },
+{ id: ‘p4’, text: ‘Apples’, checked: true },
+{ id: ‘p5’, text: ‘Cauliflower’, checked: true },
+{ id: ‘p6’, text: ‘Cherries or pineapple’, checked: true },
+{ id: ‘p7’, text: ‘strawberries’, checked: true },
+{ id: ‘p8’, text: ‘Garlic’, checked: true },
+{ id: ‘p9’, text: ‘Onions’, checked: true },
+{ id: ‘p10’, text: ‘Watermelon’, checked: true },
+{ id: ‘p11’, text: ‘Baby 🥕’, checked: true },
+{ id: ‘p12’, text: ‘Carrots’, checked: true },
+{ id: ‘p13’, text: ‘Grapes’, checked: true },
+{ id: ‘p14’, text: ‘Sweet potatoes’, checked: true }
+],
+“🧀 Dairy & Eggs”: [
+{ id: ‘d1’, text: ‘Soft tortillas’, checked: true },
+{ id: ‘d2’, text: ‘Cream cheese’, checked: true },
+{ id: ‘d3’, text: ‘Mexican cheese’, checked: true },
+{ id: ‘d4’, text: ‘Yogurt flavored’, checked: true },
+{ id: ‘d5’, text: ‘Milk’, checked: true },
+{ id: ‘d6’, text: ‘Parm’, checked: true },
+{ id: ‘d7’, text: ‘Yogurt Greek’, checked: true },
+{ id: ‘d8’, text: ‘Halloumi’, checked: true },
+{ id: ‘d9’, text: ‘Eggs’, checked: true },
+{ id: ‘d10’, text: ‘Queso’, checked: true },
+{ id: ‘d11’, text: ‘Mozz’, checked: true },
+{ id: ‘d12’, text: ‘Cheese sticks’, checked: true },
+{ id: ‘d13’, text: ‘Feta’, checked: true }
+],
+“🥩 Meat & Alternatives”: [
+{ id: ‘m1’, text: ‘Hummus’, checked: true },
+{ id: ‘m2’, text: ‘Chicken nuggets’, checked: true },
+{ id: ‘m3’, text: ‘Tofu (2)’, checked: true },
+{ id: ‘m4’, text: ‘Pepperoni’, checked: true },
+{ id: ‘m5’, text: ‘Meat sticks’, checked: true },
+{ id: ‘m6’, text: ‘Ham for lunchables’, checked: true },
+{ id: ‘m7’, text: ‘Hot dogs’, checked: true }
+],
+“❄️ Frozen”: [
+{ id: ‘f1’, text: ‘Chicken tenders or nuggets’, checked: true },
+{ id: ‘f2’, text: ‘Frozen broccoli’, checked: true },
+{ id: ‘f3’, text: ‘Italian ices lemon’, checked: true },
+{ id: ‘f4’, text: ‘Ice cream’, checked: true },
+{ id: ‘f5’, text: ‘Ice cream cookie dough’, checked: true },
+{ id: ‘f6’, text: ‘Shrimp’, checked: true },
+{ id: ‘f7’, text: ‘mini pancakes’, checked: false },
+{ id: ‘f8’, text: ‘Sweet potato fries’, checked: true },
+{ id: ‘f9’, text: ‘Frozen blueberries’, checked: true },
+{ id: ‘f10’, text: ‘Frozen strawberries’, checked: true },
+{ id: ‘f11’, text: ‘Frozen pizza’, checked: true },
+{ id: ‘f12’, text: ‘Veggie burgers’, checked: true },
+{ id: ‘f13’, text: ‘Edamame’, checked: true }
+],
+“🥫 Pantry & Dry Goods”: [
+{ id: ‘pg1’, text: ‘Kosher salt’, checked: false },
+{ id: ‘pg2’, text: ‘Coffee’, checked: true },
+{ id: ‘pg3’, text: ‘2 Cans cannellini beans’, checked: true },
+{ id: ‘pg4’, text: ‘2 cans black beans’, checked: true },
+{ id: ‘pg5’, text: ‘Light brown sugar’, checked: false },
+{ id: ‘pg6’, text: ‘Spaghetti sauce’, checked: true },
+{ id: ‘pg7’, text: ‘Dark brown sugar’, checked: false },
+{ id: ‘pg8’, text: ‘Table salt’, checked: false },
+{ id: ‘pg9’, text: ‘Mayo’, checked: true },
+{ id: ‘pg10’, text: ‘Salsa’, checked: true },
+{ id: ‘pg11’, text: ‘Ketchup’, checked: true }
+],
+“🍝 Grains & Pasta”: [
+{ id: ‘gp1’, text: ‘Pizza dough’, checked: true },
+{ id: ‘gp2’, text: ‘White rice’, checked: true },
+{ id: ‘gp3’, text: ‘Pasta, long, short’, checked: true },
+{ id: ‘gp4’, text: ‘Brown rice’, checked: true }
+],
+“🥣 Cereal”: [
+{ id: ‘c1’, text: ‘Honey Nut Cheerios’, checked: true },
+{ id: ‘c2’, text: ‘Oatmeal’, checked: true },
+{ id: ‘c3’, text: ‘Granola muslei’, checked: true },
+{ id: ‘c4’, text: ‘Cheerios’, checked: true }
+],
+“🧃 Beverages”: [
+{ id: ‘b1’, text: ‘Lime juice’, checked: true },
+{ id: ‘b2’, text: ‘Seltzer’, checked: true },
+{ id: ‘b3’, text: ‘Apple cider/juice’, checked: true },
+{ id: ‘b4’, text: ‘Lemon juice’, checked: true },
+{ id: ‘b5’, text: ‘2 - 2 liter bottles’, checked: true }
+],
+“🍬 Snacks & Treats”: [
+{ id: ‘s1’, text: ‘Snacks’, checked: true },
+{ id: ‘s2’, text: ‘SunChips’, checked: true },
+{ id: ‘s3’, text: ‘Ice cream’, checked: true },
+{ id: ‘s4’, text: ‘Italian ices (lemon)’, checked: true },
+{ id: ‘s5’, text: ‘Lunch snacks’, checked: true },
+{ id: ‘s6’, text: ‘Popsicles’, checked: true },
+{ id: ‘s7’, text: ‘crackers to make lunchables’, checked: true },
+{ id: ‘s8’, text: ‘Pistachios’, checked: true },
+{ id: ‘s9’, text: ‘Party and chocolate muffins’, checked: true },
+{ id: ‘s10’, text: ‘Walnuts’, checked: true },
+{ id: ‘s11’, text: ‘Marshmallows’, checked: true },
+{ id: ‘s12’, text: ‘Pretzels’, checked: true }
+],
+“🍞 Bakery”: [
+{ id: ‘bk1’, text: ‘Challah’, checked: true },
+{ id: ‘bk2’, text: ‘Bread’, checked: true },
+{ id: ‘bk3’, text: ‘Pizza dough’, checked: true },
+{ id: ‘bk4’, text: ‘Buns’, checked: true },
+{ id: ‘bk5’, text: ‘Kids bread’, checked: true },
+{ id: ‘bk6’, text: ‘Hot dog buns’, checked: true },
+{ id: ‘bk7’, text: ‘Plain bagels for Louisa lunch’, checked: true }
+]
+};
+
+const [items, setItems] = useState(() => {
+const saved = localStorage.getItem(‘shoppingList’);
+return saved ? JSON.parse(saved) : initialItems;
+});
+
+useEffect(() => {
+localStorage.setItem(‘shoppingList’, JSON.stringify(items));
+}, [items]);
+
+const toggleItem = (category, itemId) => {
+setItems(prev => ({
+…prev,
+[category]: prev[category].map(item =>
+item.id === itemId ? { …item, checked: !item.checked } : item
+)
+}));
+};
+
+const getTotalStats = () => {
+let total = 0;
+let completed = 0;
+Object.values(items).forEach(category => {
+category.forEach(item => {
+total++;
+if (item.checked) completed++;
+});
+});
+return { total, completed };
+};
+
+const stats = getTotalStats();
+
+return (
+<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 pb-20">
+<div className="sticky top-0 bg-white shadow-md z-10 p-4">
+<h1 className="text-2xl font-bold text-gray-800 text-center">Shopping List</h1>
+<div className="mt-2 flex items-center justify-center gap-2 text-sm">
+<div className="bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">
+{stats.completed} / {stats.total} items
+</div>
+<div className="text-gray-600">
+{Math.round((stats.completed / stats.total) * 100)}% complete
+</div>
+</div>
+</div>
+
+```
+  <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+    {Object.entries(items).map(([category, categoryItems]) => {
+      const categoryStats = {
+        total: categoryItems.length,
+        completed: categoryItems.filter(item => item.checked).length
+      };
+
+      return (
+        <div key={category} className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white p-4">
+            <h2 className="text-lg font-semibold">{category}</h2>
+            <div className="text-sm opacity-90 mt-1">
+              {categoryStats.completed} of {categoryStats.total} items
+            </div>
+          </div>
+          <div className="divide-y divide-gray-100">
+            {categoryItems.map(item => (
+              <label
+                key={item.id}
+                className="flex items-start p-4 cursor-pointer hover:bg-gray-50 active:bg-gray-100 transition-colors"
+              >
+                <div className="flex-shrink-0 mt-1">
+                  <div
+                    className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${
+                      item.checked
+                        ? 'bg-green-500 border-green-500'
+                        : 'border-gray-300 bg-white'
+                    }`}
+                  >
+                    {item.checked && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
+                  </div>
+                </div>
+                <span
+                  className={`ml-3 text-base flex-1 transition-all ${
+                    item.checked
+                      ? 'text-gray-400 line-through'
+                      : 'text-gray-800'
+                  }`}
+                >
+                  {item.text}
+                </span>
+                <input
+                  type="checkbox"
+                  checked={item.checked}
+                  onChange={() => toggleItem(category, item.id)}
+                  className="sr-only"
+                />
+              </label>
+            ))}
+          </div>
+        </div>
+      );
+    })}
+  </div>
+</div>
+```
+
+);
+};
+
+export default ShoppingList;
