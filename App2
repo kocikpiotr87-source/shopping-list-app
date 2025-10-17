@@ -1,235 +1,363 @@
-import React, { useState, useEffect } from ‘react’;
-import { Check } from ‘lucide-react’;
+<!DOCTYPE html>
 
-const ShoppingList = () => {
-const initialItems = {
-“FARMERS MARKET”: [
-{ id: ‘fm1’, text: ‘any other fruit or veg you see that looks good and is reasonable’, checked: false },
-{ id: ‘fm2’, text: ‘only if still looks good Lettuce - 1 large head or 2 small’, checked: true },
-{ id: ‘fm3’, text: ‘Apples’, checked: true },
-{ id: ‘fm4’, text: ‘Pears’, checked: true },
-{ id: ‘fm5’, text: ‘only if still looks good tomatoes- nice mix’, checked: true },
-{ id: ‘fm6’, text: ‘corn’, checked: true },
-{ id: ‘fm7’, text: ‘zucchini’, checked: true },
-{ id: ‘fm8’, text: ‘Cucumber’, checked: true }
-],
-“🥬 Produce”: [
-{ id: ‘p1’, text: ‘Bananas’, checked: true },
-{ id: ‘p2’, text: ‘Potatoes yellow or yukon’, checked: true },
-{ id: ‘p3’, text: ‘Lemons (lots)’, checked: true },
-{ id: ‘p4’, text: ‘Apples’, checked: true },
-{ id: ‘p5’, text: ‘Cauliflower’, checked: true },
-{ id: ‘p6’, text: ‘Cherries or pineapple’, checked: true },
-{ id: ‘p7’, text: ‘strawberries’, checked: true },
-{ id: ‘p8’, text: ‘Garlic’, checked: true },
-{ id: ‘p9’, text: ‘Onions’, checked: true },
-{ id: ‘p10’, text: ‘Watermelon’, checked: true },
-{ id: ‘p11’, text: ‘Baby 🥕’, checked: true },
-{ id: ‘p12’, text: ‘Carrots’, checked: true },
-{ id: ‘p13’, text: ‘Grapes’, checked: true },
-{ id: ‘p14’, text: ‘Sweet potatoes’, checked: true }
-],
-“🧀 Dairy & Eggs”: [
-{ id: ‘d1’, text: ‘Soft tortillas’, checked: true },
-{ id: ‘d2’, text: ‘Cream cheese’, checked: true },
-{ id: ‘d3’, text: ‘Mexican cheese’, checked: true },
-{ id: ‘d4’, text: ‘Yogurt flavored’, checked: true },
-{ id: ‘d5’, text: ‘Milk’, checked: true },
-{ id: ‘d6’, text: ‘Parm’, checked: true },
-{ id: ‘d7’, text: ‘Yogurt Greek’, checked: true },
-{ id: ‘d8’, text: ‘Halloumi’, checked: true },
-{ id: ‘d9’, text: ‘Eggs’, checked: true },
-{ id: ‘d10’, text: ‘Queso’, checked: true },
-{ id: ‘d11’, text: ‘Mozz’, checked: true },
-{ id: ‘d12’, text: ‘Cheese sticks’, checked: true },
-{ id: ‘d13’, text: ‘Feta’, checked: true }
-],
-“🥩 Meat & Alternatives”: [
-{ id: ‘m1’, text: ‘Hummus’, checked: true },
-{ id: ‘m2’, text: ‘Chicken nuggets’, checked: true },
-{ id: ‘m3’, text: ‘Tofu (2)’, checked: true },
-{ id: ‘m4’, text: ‘Pepperoni’, checked: true },
-{ id: ‘m5’, text: ‘Meat sticks’, checked: true },
-{ id: ‘m6’, text: ‘Ham for lunchables’, checked: true },
-{ id: ‘m7’, text: ‘Hot dogs’, checked: true }
-],
-“❄️ Frozen”: [
-{ id: ‘f1’, text: ‘Chicken tenders or nuggets’, checked: true },
-{ id: ‘f2’, text: ‘Frozen broccoli’, checked: true },
-{ id: ‘f3’, text: ‘Italian ices lemon’, checked: true },
-{ id: ‘f4’, text: ‘Ice cream’, checked: true },
-{ id: ‘f5’, text: ‘Ice cream cookie dough’, checked: true },
-{ id: ‘f6’, text: ‘Shrimp’, checked: true },
-{ id: ‘f7’, text: ‘mini pancakes’, checked: false },
-{ id: ‘f8’, text: ‘Sweet potato fries’, checked: true },
-{ id: ‘f9’, text: ‘Frozen blueberries’, checked: true },
-{ id: ‘f10’, text: ‘Frozen strawberries’, checked: true },
-{ id: ‘f11’, text: ‘Frozen pizza’, checked: true },
-{ id: ‘f12’, text: ‘Veggie burgers’, checked: true },
-{ id: ‘f13’, text: ‘Edamame’, checked: true }
-],
-“🥫 Pantry & Dry Goods”: [
-{ id: ‘pg1’, text: ‘Kosher salt’, checked: false },
-{ id: ‘pg2’, text: ‘Coffee’, checked: true },
-{ id: ‘pg3’, text: ‘2 Cans cannellini beans’, checked: true },
-{ id: ‘pg4’, text: ‘2 cans black beans’, checked: true },
-{ id: ‘pg5’, text: ‘Light brown sugar’, checked: false },
-{ id: ‘pg6’, text: ‘Spaghetti sauce’, checked: true },
-{ id: ‘pg7’, text: ‘Dark brown sugar’, checked: false },
-{ id: ‘pg8’, text: ‘Table salt’, checked: false },
-{ id: ‘pg9’, text: ‘Mayo’, checked: true },
-{ id: ‘pg10’, text: ‘Salsa’, checked: true },
-{ id: ‘pg11’, text: ‘Ketchup’, checked: true }
-],
-“🍝 Grains & Pasta”: [
-{ id: ‘gp1’, text: ‘Pizza dough’, checked: true },
-{ id: ‘gp2’, text: ‘White rice’, checked: true },
-{ id: ‘gp3’, text: ‘Pasta, long, short’, checked: true },
-{ id: ‘gp4’, text: ‘Brown rice’, checked: true }
-],
-“🥣 Cereal”: [
-{ id: ‘c1’, text: ‘Honey Nut Cheerios’, checked: true },
-{ id: ‘c2’, text: ‘Oatmeal’, checked: true },
-{ id: ‘c3’, text: ‘Granola muslei’, checked: true },
-{ id: ‘c4’, text: ‘Cheerios’, checked: true }
-],
-“🧃 Beverages”: [
-{ id: ‘b1’, text: ‘Lime juice’, checked: true },
-{ id: ‘b2’, text: ‘Seltzer’, checked: true },
-{ id: ‘b3’, text: ‘Apple cider/juice’, checked: true },
-{ id: ‘b4’, text: ‘Lemon juice’, checked: true },
-{ id: ‘b5’, text: ‘2 - 2 liter bottles’, checked: true }
-],
-“🍬 Snacks & Treats”: [
-{ id: ‘s1’, text: ‘Snacks’, checked: true },
-{ id: ‘s2’, text: ‘SunChips’, checked: true },
-{ id: ‘s3’, text: ‘Ice cream’, checked: true },
-{ id: ‘s4’, text: ‘Italian ices (lemon)’, checked: true },
-{ id: ‘s5’, text: ‘Lunch snacks’, checked: true },
-{ id: ‘s6’, text: ‘Popsicles’, checked: true },
-{ id: ‘s7’, text: ‘crackers to make lunchables’, checked: true },
-{ id: ‘s8’, text: ‘Pistachios’, checked: true },
-{ id: ‘s9’, text: ‘Party and chocolate muffins’, checked: true },
-{ id: ‘s10’, text: ‘Walnuts’, checked: true },
-{ id: ‘s11’, text: ‘Marshmallows’, checked: true },
-{ id: ‘s12’, text: ‘Pretzels’, checked: true }
-],
-“🍞 Bakery”: [
-{ id: ‘bk1’, text: ‘Challah’, checked: true },
-{ id: ‘bk2’, text: ‘Bread’, checked: true },
-{ id: ‘bk3’, text: ‘Pizza dough’, checked: true },
-{ id: ‘bk4’, text: ‘Buns’, checked: true },
-{ id: ‘bk5’, text: ‘Kids bread’, checked: true },
-{ id: ‘bk6’, text: ‘Hot dog buns’, checked: true },
-{ id: ‘bk7’, text: ‘Plain bagels for Louisa lunch’, checked: true }
-]
-};
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Shopping List">
+  <meta name="theme-color" content="#6366f1">
+  <title>Shopping List</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(to bottom right, #dbeafe, #e0e7ff);
+      min-height: 100vh;
+      padding-bottom: 80px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .header {
+      position: sticky;
+      top: 0;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 1rem;
+      z-index: 10;
+    }
+    h1 {
+      text-align: center;
+      color: #1f2937;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .search-box {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+    }
+    .stat-badge {
+      background: #d1fae5;
+      color: #065f46;
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-weight: 500;
+    }
+    .buttons {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-check {
+      background: #10b981;
+      color: white;
+    }
+    .btn-check:hover {
+      background: #059669;
+    }
+    .btn-clear {
+      background: #ef4444;
+      color: white;
+    }
+    .btn-clear:hover {
+      background: #dc2626;
+    }
+    .container {
+      max-width: 48rem;
+      margin: 0 auto;
+      padding: 1.5rem 1rem;
+    }
+    .category {
+      background: white;
+      border-radius: 1rem;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .category-header {
+      background: linear-gradient(to right, #6366f1, #a855f7);
+      color: white;
+      padding: 1rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .category-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+    }
+    .category-subtitle {
+      font-size: 0.875rem;
+      opacity: 0.9;
+      margin-top: 0.25rem;
+    }
+    .category-items {
+      border-top: 1px solid #f3f4f6;
+    }
+    .item {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      border-bottom: 1px solid #f3f4f6;
+      transition: background 0.2s;
+    }
+    .item:hover {
+      background: #f9fafb;
+    }
+    .item:last-child {
+      border-bottom: none;
+    }
+    .checkbox {
+      width: 1.25rem;
+      height: 1.25rem;
+      border-radius: 0.375rem;
+      cursor: pointer;
+    }
+    .item-text {
+      flex: 1;
+      margin-left: 0.75rem;
+      font-size: 1rem;
+      color: #1f2937;
+    }
+    .item-text.checked {
+      color: #9ca3af;
+      text-decoration: line-through;
+    }
+    .notification {
+      position: fixed;
+      top: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #10b981;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 50;
+      display: none;
+    }
+    .notification.show {
+      display: block;
+      animation: bounce 1s;
+    }
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateX(-50%) translateY(0);
+      }
+      40% {
+        transform: translateX(-50%) translateY(-10px);
+      }
+      60% {
+        transform: translateX(-50%) translateY(-5px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="notification" id="notification"></div>
 
-const [items, setItems] = useState(() => {
-const saved = localStorage.getItem(‘shoppingList’);
-return saved ? JSON.parse(saved) : initialItems;
-});
-
-useEffect(() => {
-localStorage.setItem(‘shoppingList’, JSON.stringify(items));
-}, [items]);
-
-const toggleItem = (category, itemId) => {
-setItems(prev => ({
-…prev,
-[category]: prev[category].map(item =>
-item.id === itemId ? { …item, checked: !item.checked } : item
-)
-}));
-};
-
-const getTotalStats = () => {
-let total = 0;
-let completed = 0;
-Object.values(items).forEach(category => {
-category.forEach(item => {
-total++;
-if (item.checked) completed++;
-});
-});
-return { total, completed };
-};
-
-const stats = getTotalStats();
-
-return (
-<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 pb-20">
-<div className="sticky top-0 bg-white shadow-md z-10 p-4">
-<h1 className="text-2xl font-bold text-gray-800 text-center">Shopping List</h1>
-<div className="mt-2 flex items-center justify-center gap-2 text-sm">
-<div className="bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">
-{stats.completed} / {stats.total} items
-</div>
-<div className="text-gray-600">
-{Math.round((stats.completed / stats.total) * 100)}% complete
-</div>
-</div>
-</div>
-
-```
-  <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
-    {Object.entries(items).map(([category, categoryItems]) => {
-      const categoryStats = {
-        total: categoryItems.length,
-        completed: categoryItems.filter(item => item.checked).length
-      };
-
-      return (
-        <div key={category} className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white p-4">
-            <h2 className="text-lg font-semibold">{category}</h2>
-            <div className="text-sm opacity-90 mt-1">
-              {categoryStats.completed} of {categoryStats.total} items
-            </div>
-          </div>
-          <div className="divide-y divide-gray-100">
-            {categoryItems.map(item => (
-              <label
-                key={item.id}
-                className="flex items-start p-4 cursor-pointer hover:bg-gray-50 active:bg-gray-100 transition-colors"
-              >
-                <div className="flex-shrink-0 mt-1">
-                  <div
-                    className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${
-                      item.checked
-                        ? 'bg-green-500 border-green-500'
-                        : 'border-gray-300 bg-white'
-                    }`}
-                  >
-                    {item.checked && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
-                  </div>
-                </div>
-                <span
-                  className={`ml-3 text-base flex-1 transition-all ${
-                    item.checked
-                      ? 'text-gray-400 line-through'
-                      : 'text-gray-800'
-                  }`}
-                >
-                  {item.text}
-                </span>
-                <input
-                  type="checkbox"
-                  checked={item.checked}
-                  onChange={() => toggleItem(category, item.id)}
-                  className="sr-only"
-                />
-              </label>
-            ))}
-          </div>
-        </div>
-      );
-    })}
+  <div class="header">
+    <h1>Shopping List</h1>
+    <input type="text" id="search" class="search-box" placeholder="Search items...">
+    <div class="stats">
+      <span class="stat-badge" id="stats"></span>
+      <span id="percent"></span>
+    </div>
+    <div class="buttons">
+      <button class="btn-check" onclick="checkAll()">Check All</button>
+      <button class="btn-clear" onclick="clearAll()">Clear All</button>
+    </div>
   </div>
-</div>
-```
 
-);
-};
+  <div class="container" id="container"></div>
 
-export default ShoppingList;
+  <script>
+    const initialItems = {"FARMERS MARKET":[{id:"fm1",text:"any other fruit or veg you see that looks good and is reasonable",checked:false},{id:"fm2",text:"only if still looks good Lettuce - 1 large head or 2 small",checked:true},{id:"fm3",text:"Apples",checked:true},{id:"fm4",text:"Pears",checked:true},{id:"fm5",text:"only if still looks good tomatoes- nice mix",checked:true},{id:"fm6",text:"corn",checked:true},{id:"fm7",text:"zucchini",checked:true},{id:"fm8",text:"Cucumber",checked:true}],"🥬 Produce":[{id:"p1",text:"Bananas",checked:true},{id:"p2",text:"Potatoes yellow or yukon",checked:true},{id:"p3",text:"Lemons (lots)",checked:true},{id:"p4",text:"Apples",checked:true},{id:"p5",text:"Cauliflower",checked:true},{id:"p6",text:"Cherries or pineapple",checked:true},{id:"p7",text:"strawberries",checked:true},{id:"p8",text:"Garlic",checked:true},{id:"p9",text:"Onions",checked:true},{id:"p10",text:"Watermelon",checked:true},{id:"p11",text:"Baby 🥕",checked:true},{id:"p12",text:"Carrots",checked:true},{id:"p13",text:"Grapes",checked:true},{id:"p14",text:"Sweet potatoes",checked:true}],"🧀 Dairy & Eggs":[{id:"d1",text:"Soft tortillas",checked:true},{id:"d2",text:"Cream cheese",checked:true},{id:"d3",text:"Mexican cheese",checked:true},{id:"d4",text:"Yogurt flavored",checked:true},{id:"d5",text:"Milk",checked:true},{id:"d6",text:"Parm",checked:true},{id:"d7",text:"Yogurt Greek",checked:true},{id:"d8",text:"Halloumi",checked:true},{id:"d9",text:"Eggs",checked:true},{id:"d10",text:"Queso",checked:true},{id:"d11",text:"Mozz",checked:true},{id:"d12",text:"Cheese sticks",checked:true},{id:"d13",text:"Feta",checked:true}],"🥩 Meat & Alternatives":[{id:"m1",text:"Hummus",checked:true},{id:"m2",text:"Chicken nuggets",checked:true},{id:"m3",text:"Tofu (2)",checked:true},{id:"m4",text:"Pepperoni",checked:true},{id:"m5",text:"Meat sticks",checked:true},{id:"m6",text:"Ham for lunchables",checked:true},{id:"m7",text:"Hot dogs",checked:true}],"❄️ Frozen":[{id:"f1",text:"Chicken tenders or nuggets",checked:true},{id:"f2",text:"Frozen broccoli",checked:true},{id:"f3",text:"Italian ices lemon",checked:true},{id:"f4",text:"Ice cream",checked:true},{id:"f5",text:"Ice cream cookie dough",checked:true},{id:"f6",text:"Shrimp",checked:true},{id:"f7",text:"mini pancakes",checked:false},{id:"f8",text:"Sweet potato fries",checked:true},{id:"f9",text:"Frozen blueberries",checked:true},{id:"f10",text:"Frozen strawberries",checked:true},{id:"f11",text:"Frozen pizza",checked:true},{id:"f12",text:"Veggie burgers",checked:true},{id:"f13",text:"Edamame",checked:true}],"🥫 Pantry & Dry Goods":[{id:"pg1",text:"Kosher salt",checked:false},{id:"pg2",text:"Coffee",checked:true},{id:"pg3",text:"2 Cans cannellini beans",checked:true},{id:"pg4",text:"2 cans black beans",checked:true},{id:"pg5",text:"Light brown sugar",checked:false},{id:"pg6",text:"Spaghetti sauce",checked:true},{id:"pg7",text:"Dark brown sugar",checked:false},{id:"pg8",text:"Table salt",checked:false},{id:"pg9",text:"Mayo",checked:true},{id:"pg10",text:"Salsa",checked:true},{id:"pg11",text:"Ketchup",checked:true}],"🍝 Grains & Pasta":[{id:"gp1",text:"Pizza dough",checked:true},{id:"gp2",text:"White rice",checked:true},{id:"gp3",text:"Pasta, long, short",checked:true},{id:"gp4",text:"Brown rice",checked:true}],"🥣 Cereal":[{id:"c1",text:"Honey Nut Cheerios",checked:true},{id:"c2",text:"Oatmeal",checked:true},{id:"c3",text:"Granola muslei",checked:true},{id:"c4",text:"Cheerios",checked:true}],"🧃 Beverages":[{id:"b1",text:"Lime juice",checked:true},{id:"b2",text:"Seltzer",checked:true},{id:"b3",text:"Apple cider/juice",checked:true},{id:"b4",text:"Lemon juice",checked:true},{id:"b5",text:"2 - 2 liter bottles",checked:true}],"🍬 Snacks & Treats":[{id:"s1",text:"Snacks",checked:true},{id:"s2",text:"SunChips",checked:true},{id:"s3",text:"Ice cream",checked:true},{id:"s4",text:"Italian ices (lemon)",checked:true},{id:"s5",text:"Lunch snacks",checked:true},{id:"s6",text:"Popsicles",checked:true},{id:"s7",text:"crackers to make lunchables",checked:true},{id:"s8",text:"Pistachios",checked:true},{id:"s9",text:"Party and chocolate muffins",checked:true},{id:"s10",text:"Walnuts",checked:true},{id:"s11",text:"Marshmallows",checked:true},{id:"s12",text:"Pretzels",checked:true}],"🍞 Bakery":[{id:"bk1",text:"Challah",checked:true},{id:"bk2",text:"Bread",checked:true},{id:"bk3",text:"Pizza dough",checked:true},{id:"bk4",text:"Buns",checked:true},{id:"bk5",text:"Kids bread",checked:true},{id:"bk6",text:"Hot dog buns",checked:true},{id:"bk7",text:"Plain bagels for Louisa lunch",checked:true}]};
+
+    let items = {};
+    let categoryOrder = [];
+    let collapsed = {};
+
+    function loadData() {
+      const params = new URLSearchParams(window.location.search);
+      const sharedData = params.get('data');
+      if (sharedData) {
+        try {
+          const decoded = JSON.parse(atob(decodeURIComponent(sharedData)));
+          items = decoded.items || decoded;
+          categoryOrder = decoded.categoryOrder || Object.keys(items);
+          showNotification('Shared list loaded!');
+          window.history.replaceState({}, document.title, window.location.pathname);
+          saveData();
+          return;
+        } catch (e) {}
+      }
+      
+      const saved = localStorage.getItem('shoppingList');
+      if (saved) {
+        items = JSON.parse(saved);
+      } else {
+        items = initialItems;
+      }
+      
+      const savedOrder = localStorage.getItem('categoryOrder');
+      categoryOrder = savedOrder ? JSON.parse(savedOrder) : Object.keys(items);
+      
+      const savedCollapsed = localStorage.getItem('collapsed');
+      collapsed = savedCollapsed ? JSON.parse(savedCollapsed) : {};
+    }
+
+    function saveData() {
+      localStorage.setItem('shoppingList', JSON.stringify(items));
+      localStorage.setItem('categoryOrder', JSON.stringify(categoryOrder));
+      localStorage.setItem('collapsed', JSON.stringify(collapsed));
+    }
+
+    function showNotification(msg) {
+      const el = document.getElementById('notification');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    function updateStats() {
+      let total = 0, completed = 0;
+      Object.values(items).forEach(category => {
+        category.forEach(item => {
+          total++;
+          if (item.checked) completed++;
+        });
+      });
+      document.getElementById('stats').textContent = `${completed} / ${total} items`;
+      document.getElementById('percent').textContent = `${Math.round((completed / total) * 100)}% complete`;
+    }
+
+    function toggleItem(category, itemId) {
+      items[category] = items[category].map(item =>
+        item.id === itemId ? { ...item, checked: !item.checked } : item
+      );
+      saveData();
+      render();
+    }
+
+    function toggleCategory(category) {
+      collapsed[category] = !collapsed[category];
+      saveData();
+      render();
+    }
+
+    function checkAll() {
+      Object.keys(items).forEach(category => {
+        items[category] = items[category].map(item => ({ ...item, checked: true }));
+      });
+      saveData();
+      showNotification('All checked!');
+      render();
+    }
+
+    function clearAll() {
+      Object.keys(items).forEach(category => {
+        items[category] = items[category].map(item => ({ ...item, checked: false }));
+      });
+      saveData();
+      showNotification('All cleared!');
+      render();
+    }
+
+    function render() {
+      const searchQuery = document.getElementById('search').value.toLowerCase();
+      const container = document.getElementById('container');
+      container.innerHTML = '';
+
+      categoryOrder.forEach(category => {
+        const categoryItems = items[category] || [];
+        const filteredItems = searchQuery 
+          ? categoryItems.filter(item => item.text.toLowerCase().includes(searchQuery))
+          : categoryItems;
+
+        if (filteredItems.length === 0 && searchQuery) return;
+
+        const completed = categoryItems.filter(i => i.checked).length;
+        const isCollapsed = collapsed[category];
+
+        const categoryDiv = document.createElement('div');
+        categoryDiv.className = 'category';
+
+        const header = document.createElement('div');
+        header.className = 'category-header';
+        header.onclick = () => toggleCategory(category);
+        header.innerHTML = `
+          <div>
+            <div class="category-title">${category}</div>
+            <div class="category-subtitle">${completed} of ${categoryItems.length} items</div>
+          </div>
+          <span style="font-size: 1.5rem;">${isCollapsed ? '▼' : '▲'}</span>
+        `;
+        categoryDiv.appendChild(header);
+
+        if (!isCollapsed) {
+          const itemsDiv = document.createElement('div');
+          itemsDiv.className = 'category-items';
+
+          filteredItems.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'item';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'checkbox';
+            checkbox.checked = item.checked;
+            checkbox.onchange = () => toggleItem(category, item.id);
+            
+            const text = document.createElement('div');
+            text.className = 'item-text' + (item.checked ? ' checked' : '');
+            text.textContent = item.text;
+            
+            itemDiv.appendChild(checkbox);
+            itemDiv.appendChild(text);
+            itemsDiv.appendChild(itemDiv);
+          });
+
+          categoryDiv.appendChild(itemsDiv);
+        }
+
+        container.appendChild(categoryDiv);
+      });
+
+      updateStats();
+    }
+
+    document.getElementById('search').addEventListener('input', render);
+
+    loadData();
+    render();
+  </script>
+
+</body>
+</html>
