@@ -87,6 +87,13 @@
     .btn-clear:hover {
       background: #dc2626;
     }
+    .btn-share {
+      background: #3b82f6;
+      color: white;
+    }
+    .btn-share:hover {
+      background: #2563eb;
+    }
     .container {
       max-width: 48rem;
       margin: 0 auto;
@@ -192,6 +199,7 @@
     <div class="buttons">
       <button class="btn-check" onclick="checkAll()">Check All</button>
       <button class="btn-clear" onclick="clearAll()">Clear All</button>
+      <button class="btn-share" onclick="shareList()">Share List</button>
     </div>
   </div>
 
@@ -288,6 +296,54 @@
       saveData();
       showNotification('All cleared!');
       render();
+    }
+
+    function shareList() {
+      const data = {
+        items: items,
+        categoryOrder: categoryOrder
+      };
+      const encoded = encodeURIComponent(btoa(JSON.stringify(data)));
+      
+      // Get the current page URL (your GitHub Pages URL)
+      const baseUrl = window.location.href.split('?')[0];
+      const shareUrl = `${baseUrl}?data=${encoded}`;
+      
+      // Try native share first (works on mobile)
+      if (navigator.share) {
+        navigator.share({
+          title: 'Shopping List',
+          text: 'Check out my shopping list!',
+          url: shareUrl
+        }).then(() => {
+          showNotification('Shared successfully!');
+        }).catch(() => {
+          // If share is cancelled, copy to clipboard
+          copyToClipboard(shareUrl);
+        });
+      } else {
+        // Fallback to copying to clipboard
+        copyToClipboard(shareUrl);
+      }
+    }
+
+    function copyToClipboard(text) {
+      // Create a temporary textarea
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      
+      try {
+        document.execCommand('copy');
+        showNotification('Link copied to clipboard!');
+      } catch (err) {
+        showNotification('Failed to copy link');
+      }
+      
+      document.body.removeChild(textarea);
     }
 
     function render() {
